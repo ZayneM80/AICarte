@@ -1,0 +1,72 @@
+<view class="ai-page">
+  <!-- 导航栏 -->
+  <view class="nav-bar" style="background-color:#E95F3C; padding-top:{{statusBarHeight}}px;">
+    <view class="nav-inner">
+      <view class="nav-back" bindtap="goBack">
+        <image class="back-icon" src="../../static/btn_back.png"></image>
+      </view>
+      <view class="nav-title">AI点餐助手</view>
+    </view>
+  </view>
+
+  <!-- 消息列表 -->
+  <scroll-view class="chat-list" scroll-y="{{true}}" scroll-into-view="{{lastMsgId}}" scroll-with-animation="{{true}}">
+    <!-- 欢迎消息 -->
+    <view class="msg-row ai-msg" id="msg-welcome">
+      <view class="avatar ai-avatar">
+        <image src="../../static/logo_ruiji.png"></image>
+      </view>
+      <view class="bubble ai-bubble">你好！我是AI点餐助手 🎉
+
+我可以帮你：
+• 推荐菜品 — 告诉我你的口味和预算
+• 直接点餐 — 说"来份麻婆豆腐"
+• 查看购物车 — 说"购物车有什么"
+• 下单结账 — 说"我要下单"
+
+你想吃什么？</view>
+    </view>
+
+    <!-- 对话消息 -->
+    <block wx:for="{{messages}}" wx:for-index="idx" wx:for-item="msg" wx:key="idx">
+      <view class="msg-row {{msg.role === 'user' ? 'user-msg' : 'ai-msg'}}" id="msg-{{idx}}">
+        <view class="avatar {{msg.role === 'user' ? 'user-avatar' : 'ai-avatar'}}">
+          <image wx:if="{{msg.role === 'user'}}" src="../../static/btn_waiter_sel.png"></image>
+          <image wx:else src="../../static/logo_ruiji.png"></image>
+        </view>
+        <view class="bubble {{msg.role === 'user' ? 'user-bubble' : 'ai-bubble'}}">{{msg.content}}</view>
+      </view>
+    </block>
+
+    <!-- 加载中 -->
+    <view class="msg-row ai-msg" wx:if="{{loading}}" id="msg-loading">
+      <view class="avatar ai-avatar">
+        <image src="../../static/logo_ruiji.png"></image>
+      </view>
+      <view class="bubble ai-bubble loading-bubble">
+        <text class="dot-pulse">...</text>
+      </view>
+    </view>
+
+    <view style="height:20rpx;"></view>
+  </scroll-view>
+
+  <!-- 快捷回复 -->
+  <scroll-view class="quick-reply-row" scroll-x="{{true}}" wx:if="{{showQuickReplies}}">
+    <view class="quick-tag" bindtap="sendQuick" data-text="给我推荐几道菜">🍽 推荐菜品</view>
+    <view class="quick-tag" bindtap="sendQuick" data-text="看看购物车">🛒 购物车</view>
+    <view class="quick-tag" bindtap="sendQuick" data-text="我要下单">📦 下单</view>
+    <view class="quick-tag" bindtap="sendQuick" data-text="有什么辣的菜">🌶 辣菜</view>
+    <view class="quick-tag" bindtap="sendQuick" data-text="有什么甜的菜">🍬 甜口</view>
+  </scroll-view>
+
+  <!-- 输入区域 -->
+  <view class="input-area">
+    <view class="input-box">
+      <input class="text-input" value="{{inputMsg}}" bindinput="onInput" bindconfirm="sendMessage" placeholder="输入你想吃的菜品..." confirm-type="send" />
+    </view>
+    <view class="send-btn {{sendBtnClass}}" bindtap="sendMessage">
+      <text>发送</text>
+    </view>
+  </view>
+</view>

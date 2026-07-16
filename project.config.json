@@ -1,0 +1,27 @@
+{
+  "miniprogramRoot": "project-rjwm-weixin-uniapp-develop-wsy/unpackage/dist/dev/mp-weixin/",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "uglifyFileName": false,
+    "enhance": true,
+    "packNpmRelationList": [],
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    },
+    "useCompilerPlugins": false,
+    "minifyWXML": true
+  },
+  "compileType": "miniprogram",
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "appid": "wx6f37c391db729c5b",
+  "editorSetting": {}
+}
