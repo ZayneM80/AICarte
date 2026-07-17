@@ -8,15 +8,19 @@
       :src="dishDetailes.image"
     ></image>
     <view class="title">{{ dishDetailes.name }}</view>
+    <view class="tag-row" v-if="dishDetailes.taste || dishDetailes.spiciness">
+      <text class="tag tag-taste" v-if="dishDetailes.taste">{{ dishDetailes.taste }}</text>
+      <text class="tag tag-spicy" v-if="dishDetailes.spiciness">{{ dishDetailes.spiciness }}</text>
+    </view>
     <view class="desc">{{ dishDetailes.description }}</view>
     <view class="but_item">
       <view class="price">
         <text class="ico">￥</text>
-        {{ dishDetailes.price.toFixed(2) }}
+        {{ (dishDetailes.price || 0).toFixed(2) }}
       </view>
       <view
         class="active"
-        v-if="dishDetailes.flavors.length === 0 && dishDetailes.dishNumber > 0"
+        v-if="dishDetailes.flavors && dishDetailes.flavors.length === 0 && dishDetailes.dishNumber > 0"
       >
         <image
           src="../../../static/btn_red.png"
@@ -33,7 +37,7 @@
         ></image>
       </view>
 
-      <view class="active" v-if="dishDetailes.flavors.length > 0"
+      <view class="active" v-if="dishDetailes.flavors && dishDetailes.flavors.length > 0"
         ><view class="dish_card_add" @click="moreNormDataesHandle(dishDetailes)"
           >选择规格</view
         ></view
@@ -41,7 +45,7 @@
       <view
         class="active"
         v-if="
-          dishDetailes.dishNumber === 0 && dishDetailes.flavors.length === 0
+          dishDetailes.dishNumber === 0 && (!dishDetailes.flavors || dishDetailes.flavors.length === 0)
         "
       >
         <view class="dish_card_add" @click="addDishAction(dishDetailes, '普通')"
@@ -77,7 +81,7 @@
     <view class="but_item">
       <view class="price">
         <text class="ico">￥</text>
-        {{ dishDetailes.price }}
+        {{ dishDetailes.price || '0.00' }}
       </view>
       <view
         class="active"
@@ -135,11 +139,10 @@ export default {
   methods: {
     // 加入购物车
     addDishAction(obj, item) {
-      console.log(obj, item);
-      this.$emit("addDishAction", { obj: obj, item: item });
+      this.$emit("addDishAction", { obj, item });
     },
     redDishAction(obj, item) {
-      this.$emit("redDishAction", { obj: obj, item: item });
+      this.$emit("redDishAction", { obj, item });
     },
     // 选择规格
     moreNormDataesHandle(obj) {
@@ -173,6 +176,27 @@ export default {
     line-height: 80rpx;
     text-align: center;
     font-weight: bold;
+  }
+  .tag-row {
+    text-align: center;
+    margin-bottom: 12rpx;
+  }
+  .tag {
+    display: inline-block;
+    padding: 4rpx 16rpx;
+    margin: 0 6rpx;
+    border-radius: 20rpx;
+    font-size: 22rpx;
+  }
+  .tag-taste {
+    background: #fff3e0;
+    color: #e65100;
+    border: 1rpx solid #ffcc80;
+  }
+  .tag-spicy {
+    background: #fce4ec;
+    color: #c62828;
+    border: 1rpx solid #ef9a9a;
   }
   .dish_items {
     height: 60vh;

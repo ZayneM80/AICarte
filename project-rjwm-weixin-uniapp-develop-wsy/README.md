@@ -1,115 +1,110 @@
-<!-- ## 苍穹外卖 - 小程序  即（苍穹外卖）
+# zayne 外卖小程序
 
-#### 技术： 
-- uniapp + ws 
+基于 uni-app 开发的微信外卖小程序，配套 Java（Spring Boot）后端。
 
-#### 主要功能：
+## 目录结构
 
-- 授权获取微信信息 -> 扫二维码进入小程序  ->  获取桌台信息 和当前桌台的状态 -> 用桌台ID和店铺id  获取菜品分类和菜单 -> 操作加减菜品 和菜品详情(加减菜为多人点餐，使用ws 推送购物车信息)   ->  下单付款å
+```
+├── pages/              # 页面文件
+│   ├── index/          # 首页（点餐）
+│   ├── order/          # 下单页
+│   ├── pay/            # 支付页
+│   ├── details/        # 订单详情
+│   ├── historyOrder/   # 历史订单
+│   ├── aiChat/         # AI 点餐助手
+│   ├── address/        # 地址管理
+│   ├── my/             # 个人中心
+│   └── ...
+├── utils/              # 工具函数
+│   ├── env.js          # 【需配置】后端地址
+│   ├── request.js      # HTTP 请求封装
+│   └── webscoket.js    # 【需配置】WebSocket / MQ 连接
+├── store/              # Vuex 状态管理
+├── static/             # 静态资源
+├── manifest.json       # 【需配置】微信 AppID
+├── pages.json          # 页面路由配置
+└── project.config.json # 【需配置】微信 AppID
+```
 
-- 页面效果
+## 环境要求
 
+- [HBuilderX](https://www.dcloud.io/hbuilderx.html)（运行 uni-app）
+- [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
+- Java 后端（sky-take-out-ai）
+- Redis
+- MySQL
 
-<img src="./design/action.gif" width= "24%" />
-<img src="./design/index.png" width= "24%" />
-<img src="./design/dish.png" width= "24%" />
-<img src="./design/detail.png" width= "24%" /> -->
+## 配置清单（部署前必改）
 
+以下文件包含占位符，需要替换为你的实际值：
 
-#### 苍穹外卖小程序流程说明
-#### 2022-8-24  把苍穹外卖改成苍穹外卖、换logo
-### 注册小程序AppID相关流程
----百度搜索[微信公众平台](https://mp.weixin.qq.com/),没有账号需要进行注册，进行扫码登录
-![](./image/账号.png)
-找到开发管理
-![](./image/kaifa.png)
+### 1. 后端地址
 
-![](./image/guanli.png)
-**注意：** appid生成，项目开发过程中要使用，或者临时使用测试号（后边介绍）
-![](./image/appid.png)
+`utils/env.js`
+```js
+export const baseUrl = 'http://YOUR_SERVER_IP:8080'
+```
+- 本地开发：改为 `http://192.168.x.x:8080`（你电脑的局域网IP）
+- 服务器部署：改为你的公网 IP 或域名
 
+### 2. 微信 AppID
 
-##### uni-app介绍 [官方网页](https://uniapp.dcloud.io/resource)
+`manifest.json` 和 `project.config.json`
+```
+YOUR_WECHAT_APPID → 你小程序的 AppID
+```
+> 在 [微信公众平台](https://mp.weixin.qq.com) → 开发管理 → 复制 AppID
 
-`uni-app` 是一个使用 [Vue.js](https://vuejs.org/) 开发所有前端应用的框架，开发者编写一套代码，可发布到iOS、Android、H5、以及各种小程序（微信/支付宝/百度/头条/QQ/钉钉）等多个平台。
+### 3. WebSocket 地址和 MQ 凭据
 
-即使不跨端，`uni-app`同时也是更好的小程序开发框架。
+`utils/webscoket.js`
+```js
+url: 'wss://YOUR_WEBSOCKET_SERVER/ws'
+client.connect('YOUR_MQ_USER', 'YOUR_MQ_PASSWORD', ...)
+```
+- WebSocket 地址由后端提供
+- MQ 用户/密码由后端 RabbitMQ/ActiveMQ 配置决定
 
-具有vue和微信小程序的开发经验，可快速上手uni-app
+### 4. 店铺/餐桌 ID
 
-为什么要去学习uni-app？
+`pages/index/index.js`
+```js
+params: {
+    shopId: "YOUR_SHOP_ID",
+    storeId: "YOUR_STORE_ID",
+    tableId: "YOUR_TABLE_ID",
+}
+```
+> 这些 ID 由后端数据库生成，首次运行时从后端获取
 
-相对开发者来说，减少了学习成本，因为只学会uni-app之后，即可开发出iOS、Android、H5、以及各种小程序的应用，不需要再去学习开发其他应用的框架，相对公司而言，也大大减少了开发成本。
+## 运行步骤
 
-##### 环境搭建
+### 1. 启动后端
 
-安装编辑器HbuilderX  [下载地址](https://www.dcloud.io/hbuilderx.html)
+```bash
+# 进入后端项目目录，启动 Docker 服务
+docker-compose up -d mysql redis
 
-HBuilderX是通用的前端开发工具，但为`uni-app`做了特别强化。
+# 启动 Spring Boot 应用（sky-server）
+```
 
-下载App开发版，可开箱即用
+### 2. 修改前端配置
 
-安装微信开发者工具 [下载地址](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
+按上方「配置清单」替换所有占位符。
 
-##### 利用HbuilderX初始化项目
+### 3. 在 HBuilderX 中运行
 
-+ 点击HbuilderX菜单栏文件>项目>新建
+1. 用 HBuilderX 打开本项目
+2. 菜单栏 → 运行 → 运行到小程序模拟器 → 微信开发者工具
+3. 微信开发者工具 → 详情 → 本地设置 → 勾选「不校验合法域名」
 
-+ 选择uni-app,填写项目名称，项目创建的目录
+## 技术栈
 
-  ![](./images/create.jpg)
-
-
-##### 运行项目
-
-## ---新建项目
-
-在菜单栏中点击运行，运行到浏览器，选择浏览器即可运行
-
-在微信开发者工具里运行：进入hello-uniapp项目，点击工具栏的运行 -> 运行到小程序模拟器 -> 微信开发者工具，即可在微信开发者工具里面体验uni-app
-
-在微信开发者工具里运行：进入hello-uniapp项目，点击工具栏的运行 -> 运行到手机或模拟器 -> 选择调式的手机
-
-![](./image/weixinyunxing.png)
-**注意：**
-
-+ 如果是第一次使用，需要先配置小程序ide的相关路径，才能运行成功
-+ 微信开发者工具在设置中安全设置，服务端口开启
-![](./image/duankouhao.png)
-
-## ---导入项目
-在菜单栏中点击文件，选择导入，选择从本地目录导入
-![](./image/yunxing.png)
-
-![](./image/ceshihao.png)
-
-##### 介绍项目目录和文件作用
-
-`pages.json` 文件用来对 uni-app 进行全局配置，决定页面文件的路径、窗口样式、原生的导航栏、底部的原生tabbar 等
-
-`manifest.json` 文件是应用的配置文件，用于指定应用的名称、图标、权限等。
-
-`App.vue`是我们的跟组件，所有页面都是在`App.vue`下进行切换的，是页面入口文件，可以调用应用的生命周期函数。
-
-`main.js`是我们的项目入口文件，主要作用是初始化`vue`实例并使用需要的插件。
-
-`uni.scss`文件的用途是为了方便整体控制应用的风格。比如按钮颜色、边框风格，`uni.scss`文件里预置了一批scss变量预置。
-
-```unpackage``` 就是打包目录，在这里有各个平台的打包文件
-
-```pages``` 所有的页面存放目录
-
-```static``` 静态资源目录，例如图片等
-
-```components``` 组件存放目录
-
-为了实现多端兼容，综合考虑编译速度、运行性能等因素，`uni-app` 约定了如下开发规范：
-
-- 页面文件遵循 [Vue 单文件组件 (SFC) 规范](https://vue-loader.vuejs.org/zh/spec.html)
-- 组件标签靠近小程序规范，详见[uni-app 组件规范](https://uniapp.dcloud.io/component/README)
-- 数据绑定及事件处理同 `Vue.js` 规范，同时补充了App及页面的生命周期
-- 为兼容多端运行，建议使用flex布局进行开发
-
-
-#### 关于支付功能说明
-**注意：** 开发过程中使用的个人微信账号，资质为个人不能发起微信支付相关功能，需要企业资质才可以发起微信支付相关功能
+| 层级 | 技术 |
+|------|------|
+| 前端框架 | uni-app (Vue 2) |
+| 后端 | Spring Boot + MyBatis-Plus |
+| 数据库 | MySQL + Redis |
+| 消息推送 | WebSocket + Stomp |
+| AI | 智谱 GLM-4V |
+| 文件存储 | MinIO |

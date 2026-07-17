@@ -8,12 +8,12 @@
       <view class="order_content_box" scroll-y="true" scroll-top="0rpx">
         <!-- 支付状态 -->
         <status ref="status" :timeout="timeout" :orderDetailsData="orderDetailsData" :rocallTime="rocallTime"
-          @statusWord="statusWord" @paymentTime="paymentTime" @handlePay="handlePay" @handleReminder="handleReminder"
-          @handleRefund="handleRefund"></status>
+          @statusWord="statusWord" @paymentTime="paymentTime" @handleCancel="handleCancel" @handlePay="handlePay"
+          @handleReminder="handleReminder" @handleRefund="handleRefund" @oneMoreOrder="oneMoreOrder"></status>
         <!-- end -->
         <!-- 订单详情 -->
         <order-detail :orderDataes="orderDataes" :orderDetailsData="orderDetailsData"
-          :showDisplay="showDisplay"></order-detail>
+          :showDisplay="showDisplay" @toggleDisplay="showDisplay = !showDisplay"></order-detail>
         <!-- end -->
         <!-- 联系商家 -->
         <view class="box contactMerchant">
@@ -45,7 +45,7 @@
           </view>
           <view class="btn" v-else>
             <view @click="closePopupInfo">先等等</view>
-            <view @click="handlePhone('bottom')">拨打电话</view>
+            <view @click="handlePhone('bottom', orderDetailsData.shopTelephone)">拨打电话</view>
           </view>
         </view>
       </uni-popup>

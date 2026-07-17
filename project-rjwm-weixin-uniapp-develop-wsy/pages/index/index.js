@@ -4,7 +4,7 @@ import popMask from "./components/popMask.vue" //规格
 import popCart from "./components/popCart.vue" //购物车弹出层
 import dishDetail from "./components/dishDetail.vue" //菜品详情
 import {
-	// 苍穹外卖相关的接口
+	// zayne 相关的接口
 	userLogin,
 	getCategoryList,
 	dishListByCategoryId,
@@ -59,10 +59,10 @@ export default {
 			orderDishNumber: 0,
 			// 菜品金额
 			orderDishPrice: 0,
-			params: {
-				shopId: "f3deb",
-				storeId: "1282344676983062530",
-				tableId: "1282346960773238786",
+		params: {
+				shopId: "YOUR_SHOP_ID",
+				storeId: "YOUR_STORE_ID",
+				tableId: "YOUR_TABLE_ID",
 			},
 			// 添加一个右侧number更新以后重新刷新接口的id --- 这个id来自左侧菜品分类的id
 			rightIdAndType: {},
@@ -506,6 +506,10 @@ export default {
 					}
 				})
 				.catch((err) => { })
+				// 发起加购请求，等待接口完成
+				await this.$api.shoppingCartAdd(params)
+				// 刷新购物车列表
+				await this.getCartList()
 		},
 		// 加入购物车
 		addShop(item) {
@@ -514,8 +518,11 @@ export default {
 			this.addDishAction(item, "普通")
 		},
 		// 减菜 - 添加菜品
+		// 刷新购物车列表
+		getCartList() {
+			this.getTableOrderDishListes()
+		},
 		async redDishAction(item, form) {
-			// 实时更新obj.newCardNumber新添加的字段----加入购物车数量number
 			this.tablewareNumber--
 			this.dishDetailes.dishNumber--
 			let dishFlavorDatas = ""
@@ -530,41 +537,21 @@ export default {
 			} else {
 				dishFlavorDatas = null
 			}
-			let params = {
-				dishFlavor: dishFlavorDatas,
+			let cartId = null
+			if (form === "购物车") {
+				cartId = item.id
+			} else if (item.type === 1 || item.type === 2) {
+				const match = (this.orderListDataes || []).find(cartItem =>
+					cartItem.dishId === item.id || cartItem.setmealId === item.id
+				)
+				cartId = match ? match.id : null
 			}
-			if (item.type === 1) {
-				params = {
-					...params,
-					dishId: item.id,
-				}
-			} else if (item.type === 2) {
-				params = {
-					// ...params,
-					setmealId: item.id,
-				}
-			} else if (form === "购物车") {
-				if (item.dishId) {
-					params = {
-						...params,
-						dishId: item.dishId,
-					}
-				} else {
-					params = {
-						setmealId: item.setmealId,
-					}
-				}
+			if (!cartId) return
+			const res = await newShoppingCartSub({ id: cartId, dishFlavor: dishFlavorDatas })
+			if (res.code === 1) {
+			    await this.getCartList()
+			    this.getDishListDataes(this.rightIdAndType)
 			}
-			await newShoppingCartSub(params)
-				.then((res) => {
-					if (res.code === 1) {
-						// 调用一次购物车集合---初始化
-						this.getTableOrderDishListes()
-						// 重新调取刷新右侧具体菜品列表
-						this.getDishListDataes(this.rightIdAndType)
-					}
-				})
-				.catch((err) => { })
 		},
 		// 清空购物车
 		clearCardOrder() {

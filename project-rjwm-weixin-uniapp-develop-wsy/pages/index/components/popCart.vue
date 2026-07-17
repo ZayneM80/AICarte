@@ -83,10 +83,10 @@ export default {
     },
     // 加入购物车
     addDishAction(obj, item) {
-      this.$emit("addDishAction", { obj: obj, item: item });
+      this.$emit("addDishAction", { obj, item });
     },
     redDishAction(obj, item) {
-      this.$emit("redDishAction", { obj: obj, item: item });
+      this.$emit("redDishAction", { obj, item });
     },
   },
 };

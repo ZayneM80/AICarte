@@ -7,13 +7,13 @@
           <view>
             <view v-if="timeout">订单已超时</view>
             <view v-else
-              >支付剩余时间<text>{{ rocallTime }}</text></view
+              >支付剩余时间：<text>{{ rocallTime }}</text></view
             >
           </view>
           <view class="money"
             >￥<text>{{ orderDataInfo.orderAmount }}</text></view
           >
-          <view>{{ shopInfo().shopName }}-{{ orderDataInfo.orderNumber }}</view>
+          <view>{{ orderDataInfo.orderNumber }}</view>
         </view>
       </view>
       <view class="box payBox">
@@ -97,6 +97,16 @@ export default {
         };
         paymentOrder(params).then(async (res) => {
           if (res.code === 1) {
+            // 模拟支付：后端返回 mock=true 时直接跳成功页
+            if (res.data && res.data.mock) {
+              await uni.showToast({ title: "支付成功", icon: "success" });
+              setTimeout(() => {
+                uni.redirectTo({
+                  url: "/pages/success/index?orderId=" + this.orderId,
+                });
+              }, 1500);
+              return;
+            }
             const [err, payRes] = await uni.requestPayment({
               ...res.data,
               package: res.data.packageStr, // package 为微信支付必须的字段
@@ -131,8 +141,9 @@ export default {
     },
     // // 订单倒计时
     runTimeBack() {
-      const end = Date.parse(this.orderDataInfo.orderTime.replace(/-/g, "/"));
-      const now = Date.parse(new Date());
+      const orderTime = this.orderDataInfo.orderTime;
+      const end = typeof orderTime === 'number' ? orderTime : new Date(orderTime).getTime();
+      const now = Date.now();
       const m15 = 15 * 60 * 1000;
       const msec = m15 - (now - end);
       if (msec < 0) {

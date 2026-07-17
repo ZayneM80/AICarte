@@ -750,3 +750,17 @@ $desc-font-color: #818693;
 .class-item:last-child {
   min-height: 100vh;
 }
+
+.taste-tag {
+  display: inline-block;
+  font-size: 20rpx;
+  color: #e65100;
+  background: #fff3e0;
+  border: 1rpx solid #ffcc80;
+  border-radius: 16rpx;
+  padding: 0 10rpx;
+  margin-left: 8rpx;
+  vertical-align: middle;
+  line-height: 32rpx;
+  font-weight: normal;
+}

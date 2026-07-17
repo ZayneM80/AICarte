@@ -16,3 +16,11 @@ tests/**/coverage/
 *.sln
 *.history
 *.hbuilderx
+.hbuilderx/
+
+# 构建产物
+unpackage/dist/
+
+# IDE 本地配置
+.VSCodeCounter/
+project.private.config.json

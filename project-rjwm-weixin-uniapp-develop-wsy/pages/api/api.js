@@ -298,14 +298,14 @@ export const querySetmealDishById = (params) => {
 // 获取首页店铺信息
 export const getShopStatus = (params) => {
 	return request({
-		url: `/user/shop/status`,
+		url: `/shop/status`,
 		method: 'GET'
 	})
 }
 // 获取店铺信息
 export const getMerchantInfo = (params) => {
 	return request({
-		url: `/user/shop/getMerchantInfo`,
+		url: `/shop/getMerchantInfo`,
 		method: 'GET'
 	})
 }

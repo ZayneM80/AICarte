@@ -3,7 +3,7 @@
       "path": "pages/index/index",
       "style": {
         "navigationStyle": "custom",
-        "navigationBarTitleText": "苍穹外卖"
+        "navigationBarTitleText": "zayne"
       }
     },
     {
@@ -106,7 +106,7 @@
     ],
   "globalStyle": {
     "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "苍穹外卖",
+    "navigationBarTitleText": "zayne",
     "navigationBarBackgroundColor": "#E95F3C",
     // "navigationBarBackground": "#E95F3C",
     "backgroundColor": "#F8F8F8"

@@ -14,7 +14,7 @@
             </view>
             <view class="info_top_right">
               <view class="right_title">
-                <text>苍穹外卖</text>
+                <text>zayne</text>
                 <view class="businessStatus" v-if="shopStatus === 1">营业中</view>
                 <view class="businessStatus close" v-else>休息中</view>
               </view>
@@ -30,7 +30,7 @@
           <!-- 下部---信息简介 -->
           <view class="info_bottom">
             <view>
-              <view class="word">苍穹餐厅为顾客打造专业的大众化美食外送餐饮</view>
+              <view class="word">zayne 为顾客打造专业的大众化美食外送餐饮</view>
               <view class="address">
                 <icon></icon>
                 {{ shopInfo().shopAddress || "商家店铺获取中.." }}
@@ -68,7 +68,7 @@
             <view class="dish_info">
               <view class="dish_name" @click="openDetailHandle(item)">{{
                 item.name
-              }}</view>
+              }}<text class="taste-tag" v-if="item.taste || item.spiciness">{{item.taste || ''}}{{item.spiciness || ''}}</text></view>
               <view class="dish_label" @click="openDetailHandle(item)">{{
                 item.description || item.name
               }}</view>
@@ -139,14 +139,14 @@
       <!-- openDetailHandle 这个函数触发的菜品详情 -->
       <view class="pop_mask" v-show="openDetailPop" style="z-index: 9999">
         <dishDetail :dishDetailes="dishDetailes" :openDetailPop="openDetailPop" :dishMealData="dishMealData"
-          @redDishAction="redDishAction" @addDishAction="addDishAction" @moreNormDataesHandle="moreNormDataesHandle"
-          @dishClose="dishClose"></dishDetail>
+          @addDishAction="e => addDishAction(e.obj, e.item)" @redDishAction="e => redDishAction(e.obj, e.item)"
+          @moreNormDataesHandle="moreNormDataesHandle" @dishClose="dishClose"></dishDetail>
       </view>
       <!-- 菜品详情 - end -->
       <!-- 购物车弹框 - start -->
       <view class="pop_mask" v-show="openOrderCartList" @click="openOrderCartList = !openOrderCartList">
         <popCart :openOrderCartLis="openOrderCartList" :orderAndUserInfo="orderAndUserInfo"
-          @clearCardOrder="clearCardOrder" @addDishAction="addDishAction" @redDishAction="redDishAction"></popCart>
+          @clearCardOrder="clearCardOrder" @addDishAction="e => addDishAction(e.obj, e.item)" @redDishAction="e => redDishAction(e.obj, e.item)"></popCart>
       </view>
       <!-- 购物车弹框 - end -->
       <view class="pop_mask" v-show="loaddingSt">

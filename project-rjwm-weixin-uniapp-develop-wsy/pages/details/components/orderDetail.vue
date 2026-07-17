@@ -26,7 +26,7 @@
           </view>
         </view>
         <view class="iconUp">
-          <view @click="showDisplay = !showDisplay" v-if="orderDetailsData.orderDetailList.length > 2">
+          <view @click="$emit('toggleDisplay')" v-if="orderDetailsData.orderDetailList.length > 2">
             <text>{{ !showDisplay ? "展开更多" : "点击收起" }}</text>
             <image class="icon_img" :class="showDisplay ? 'icon_imgDown' : ''" src="../../../static/toRight.png" mode="">
             </image>

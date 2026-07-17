@@ -21,7 +21,7 @@ export default function initWebScoket(params){
 	}
 	
 	uni.connectSocket({
-	  url: 'wss://socket-canzg.itheima.net/ws'
+	  url: 'wss://YOUR_WEBSOCKET_SERVER/ws'
 	});
 	
 	uni.onSocketOpen(function (res) {
@@ -50,7 +50,7 @@ export default function initWebScoket(params){
 	var client = Stomp.over(ws)
 	
 	var destination = `/exchange/micro_app_exchange/${params.tableId}`
-	client.connect('guest', 'guest', sessionId => {
+	client.connect('YOUR_MQ_USER', 'YOUR_MQ_PASSWORD', sessionId => {
 	  console.log('sessionId', sessionId)
 	  client.subscribe(destination, (body, headers) => {
 		console.log('From MQ:', JSON.parse(body.body))
