@@ -1,0 +1,117 @@
+version: "3.8"
+
+services:
+  # ============ MySQL 8 ============
+  mysql:
+    image: mysql:8.0
+    container_name: sky-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: sky_take_out
+      TZ: Asia/Shanghai
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-time-zone=+8:00
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============ Redis 7 ============
+  redis:
+    image: redis:7-alpine
+    container_name: sky-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ============ PostgreSQL + pgvector ============
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: sky-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sky_vector
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector-data:/var/lib/postgresql/data
+      - ./db/vector-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d sky_vector"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============ MinIO ============
+  minio:
+    image: minio/minio:latest
+    container_name: sky-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============ sky-app ============
+  sky-app:
+    build: .
+    container_name: sky-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_DRUID_URL: jdbc:mysql://mysql:3306/sky_take_out?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_REDIS_HOST: redis
+      SKY_MINIO_ENDPOINT: http://minio:9000
+      SKY_VECTOR_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sky_vector
+      SKY_VECTOR_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SKY_VECTOR_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SKY_ZHIPU_API_KEY: ${ZHIPU_API_KEY}
+      SKY_ZHIPU_BASE_URL: https://open.bigmodel.cn/api/paas/v4
+      SKY_ZHIPU_MODEL: glm-4v
+      SKY_ZHIPU_CHAT_MODEL: glm-4
+      JAVA_TOOL_OPTIONS: "-Xmx512m -Xms256m"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+volumes:
+  mysql-data:
+  redis-data:
+  pgvector-data:
+  minio-data:

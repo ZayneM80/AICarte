@@ -1,0 +1,19 @@
+**/target/
+.idea
+*.iml
+*.class
+*Test.java
+**/test/
+# MinIO 数据
+minio-data/
+.minio.sys/
+
+# 敏感配置（含 API Key、数据库密码）
+application-dev.yml
+application-prod.yml
+.env
+
+# 临时/测试文件
+login.json
+img_report.txt
+extracted_images/
